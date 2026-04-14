@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rock Paper Scissors</title>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, sans-serif;
+  background: linear-gradient(135deg, #e0f7fa, #fce4ec);
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+.rps-wrap {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.score-card {
+  background: linear-gradient(135deg, #f1f8e9, #e3f2fd);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.score-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.score-num {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.score-divider {
+  font-size: 20px;
+  color: #bbb;
+}
+
+.first-to {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 1.25rem;
+}
+
+.battle {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.battle-icon {
+  font-size: 50px;
+  margin-bottom: 4px;
+}
+
+.battle-label {
+  font-size: 12px;
+  color: #777;
+}
+
+.battle-vs {
+  font-size: 14px;
+  font-weight: bold;
+  color: #999;
+}
+
+.result-banner {
+  text-align: center;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 1.25rem;
+  min-height: 40px;
+  animation: fadeSlide 0.3s ease;
+}
+
+.res-win { background: #d4edda; color: #155724; box-shadow: 0 0 12px rgba(76, 175, 80, 0.6); }
+.res-lose { background: #f8d7da; color: #721c24; box-shadow: 0 0 12px rgba(244, 67, 54, 0.5); }
+.res-tie { background: #e2e3e5; color: #555; }
+.res-empty { background: transparent; color: transparent; }
+
+.prompt-text {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.choices {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.choice-btn {
+  flex: 1;
+  max-width: 120px;
+  aspect-ratio: 1;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #ffffff, #f1f1f1);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #444;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.15s ease;
+}
+
+.choice-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+.choice-btn:active {
+  transform: scale(0.95);
+}
+
+.choice-btn .icon {
+  font-size: 34px;
+}
+
+.game-over {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.game-over-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.game-over-sub {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 1.25rem;
+}
+
+.play-again-btn {
+  padding: 10px 28px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Animations */
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pop { animation: pop 0.3s ease; }
+.animate-shake { animation: shake 0.4s ease; }
+
+.home-btn {
+  display: inline-block;
+  margin: 10px auto 20px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #f1f1f1;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  transition: all 0.15s ease;
+}
+
+.home-btn:hover {
+  transform: translateY(-2px);
+  background: #e6e6e6;
+}
+
+</style>
+</head>
+
+<body>
+<div class="rps-wrap">
+<h1>Rock Paper Scissors</h1>
+<a href="index.html" class="home-btn">🏠 Home</a>
+
+<div id="game-area">
+  <div class="score-row">
+    <div class="score-card">
+      <p class="score-label">You</p>
+      <p class="score-num" id="player-score">0</p>
+    </div>
+    <div class="score-divider">—</div>
+    <div class="score-card">
+      <p class="score-label">Computer</p>
+      <p class="score-num" id="cpu-score">0</p>
+    </div>
+  </div>
+
+  <p class="first-to">First to 5 wins</p>
+
+  <div class="battle">
+    <div class="battle-side">
+      <span class="battle-icon" id="player-icon">❓</span>
+      <span class="battle-label">You</span>
+    </div>
+    <div class="battle-vs">vs</div>
+    <div class="battle-side">
+      <span class="battle-icon" id="cpu-icon">❓</span>
+      <span class="battle-label">Computer</span>
+    </div>
+  </div>
+
+  <div class="result-banner res-empty" id="result-banner"></div>
+
+  <p class="prompt-text">Choose your move</p>
+
+  <div class="choices">
+    <button class="choice-btn" onclick="play('rock')"><span class="icon">🪨</span>Rock</button>
+    <button class="choice-btn" onclick="play('paper')"><span class="icon">📄</span>Paper</button>
+    <button class="choice-btn" onclick="play('scissors')"><span class="icon">✂️</span>Scissors</button>
+  </div>
+</div>
+
+<div id="game-over-area" style="display:none;" class="game-over">
+  <p class="game-over-title" id="go-title"></p>
+  <p class="game-over-sub" id="go-sub"></p>
+  <button class="play-again-btn" onclick="resetGame()">Play again</button>
+</div>
+
+</div>
+
+<script>
+const icons = { rock: '🪨', paper: '📄', scissors: '✂️' };
+const choices = ['rock', 'paper', 'scissors'];
+let pScore = 0, cScore = 0;
+
+function launchConfetti() {
+  for (let i = 0; i < 80; i++) {
+    const confetti = document.createElement('div');
+    confetti.style.position = 'fixed';
+    confetti.style.top = '-10px';
+    confetti.style.left = Math.random() * 100 + 'vw';
+    confetti.style.width = '8px';
+    confetti.style.height = '8px';
+    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+    confetti.style.opacity = 0.8;
+    confetti.style.borderRadius = '2px';
+    confetti.style.pointerEvents = 'none';
+    confetti.style.zIndex = 9999;
+
+    document.body.appendChild(confetti);
+
+    const fall = confetti.animate([
+      { transform: 'translateY(0px) rotate(0deg)' },
+      { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)` }
+    ], {
+      duration: 1500 + Math.random() * 1000,
+      easing: 'ease-out'
+    });
+
+    fall.onfinish = () => confetti.remove();
+  }
+}
+
+function play(playerChoice) {
+  const cpuChoice = choices[Math.floor(Math.random() * 3)];
+
+  const playerIcon = document.getElementById('player-icon');
+  const cpuIcon = document.getElementById('cpu-icon');
+
+  playerIcon.textContent = icons[playerChoice];
+  cpuIcon.textContent = icons[cpuChoice];
+
+  let result, cls;
+
+  if (playerChoice === cpuChoice) {
+    result = "It's a tie — no points awarded.";
+    cls = 'res-tie';
+  } else if (
+    (playerChoice === 'rock' && cpuChoice === 'scissors') ||
+    (playerChoice === 'paper' && cpuChoice === 'rock') ||
+    (playerChoice === 'scissors' && cpuChoice === 'paper')
+  ) {
+    result = icons[playerChoice] + ' beats ' + icons[cpuChoice] + ' — you score!';
+    cls = 'res-win';
+    pScore++;
+    playerIcon.classList.add('animate-pop');
+  } else {
+    result = icons[cpuChoice] + ' beats ' + icons[playerChoice] + ' — computer scores.';
+    cls = 'res-lose';
+    cScore++;
+    cpuIcon.classList.add('animate-shake');
+  }
+
+  document.getElementById('player-score').textContent = pScore;
+  document.getElementById('cpu-score').textContent = cScore;
+
+  const banner = document.getElementById('result-banner');
+  banner.textContent = result;
+  banner.className = 'result-banner ' + cls;
+
+  setTimeout(() => {
+    playerIcon.classList.remove('animate-pop');
+    cpuIcon.classList.remove('animate-shake');
+  }, 300);
+
+  if (pScore >= 5 || cScore >= 5) setTimeout(showGameOver, 600);
+}
+
+function showGameOver() {
+  document.getElementById('game-area').style.display = 'none';
+  document.getElementById('game-over-area').style.display = 'block';
+if (pScore >= 5) {
+  document.getElementById('go-title').textContent = 'You win!';
+  launchConfetti();
+} else {
+  document.getElementById('go-title').textContent = 'Computer wins!';
+}  document.getElementById('go-sub').textContent = 'Final score: You ' + pScore + ' — Computer ' + cScore;
+}
+
+function resetGame() {
+  pScore = 0; cScore = 0;
+  document.getElementById('player-score').textContent = 0;
+  document.getElementById('cpu-score').textContent = 0;
+  document.getElementById('player-icon').textContent = '❓';
+  document.getElementById('cpu-icon').textContent = '❓';
+  const banner = document.getElementById('result-banner');
+  banner.textContent = '';
+  banner.className = 'result-banner res-empty';
+  document.getElementById('game-area').style.display = 'block';
+  document.getElementById('game-over-area').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
